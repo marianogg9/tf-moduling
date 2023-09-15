@@ -5,7 +5,7 @@ module "the_apps" {
     app-3 = { "permissions" : ["s3:GetObjectVersion"] }
   }
 
-  source = "./my_awesome_module" # reference to our local module
+  source = "../my_awesome_module" # reference to our local module
 
   bucket_name = each.key
   role_name   = each.key
