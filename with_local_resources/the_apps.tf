@@ -70,7 +70,7 @@ resource "aws_iam_role" "the_role" { # create the IAM role and attach both assum
     app-3 = { "permissions" : ["s3:GetObjectVersion"] }
   }
 
-  name_prefix = join("", [each.key, "-"])
+  name = each.key
   path               = "/"
   assume_role_policy = data.aws_iam_policy_document.assume-policy.json
 
