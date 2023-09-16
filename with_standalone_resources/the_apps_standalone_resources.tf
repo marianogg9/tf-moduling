@@ -140,8 +140,8 @@ resource "aws_iam_role_policy_attachment" "the_policy_attachment" {
 }
 
 output "the_bucket" {
-    value = aws_s3_bucket.the_bucket.arn
+  value = values(aws_s3_bucket.the_bucket).*.arn
 }
 output "the_role" {
-    value = aws_iam_role.the_role.arn
+  value = values(aws_iam_role.the_role).*.arn
 }
