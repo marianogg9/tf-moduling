@@ -10,7 +10,6 @@ module "the_apps" {
   bucket_name = each.key
   role_name   = each.key
   permissions = each.value["permissions"]
-  oidc_url    = "your_eks_OIDC_provider_URL"
 }
 
 output "the_apps" {

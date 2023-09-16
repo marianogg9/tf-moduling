@@ -1,3 +1,9 @@
+data "aws_eks_cluster" "this" { # get EKS cluster attributes to use later on.
+  name = "test-eks-cluster"
+}
+
+data "aws_caller_identity" "current" {} # get current account ID
+
 module "iam_assumable_role_with_oidc" {
   source      = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
 
@@ -7,7 +13,7 @@ module "iam_assumable_role_with_oidc" {
   tags = {
     # add some tags!
   }
-  provider_url = var.oidc_url
+  provider_url = data.aws_eks_cluster.this.identity[0].oidc[0].issuer
 
   role_policy_arns = [
     aws_iam_policy.the_policy.arn,

@@ -13,8 +13,3 @@ variable "permissions" {
     type        = list
     default     = []
 }
-variable "oidc_url" {
-    description = "OIDC provider URL, taken from the EKS cluster"
-    type        = string
-    default     = ""
-}
