@@ -138,3 +138,10 @@ resource "aws_iam_role_policy_attachment" "the_policy_attachment" {
   role       = aws_iam_role.the_role[each.key].name
   policy_arn = aws_iam_policy.the_policy[each.key].arn
 }
+
+output "the_bucket" {
+    value = aws_s3_bucket.the_bucket.arn
+}
+output "the_role" {
+    value = aws_iam_role.the_role.arn
+}
