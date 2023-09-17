@@ -1,3 +1,11 @@
+locals {
+  apps = {
+    app-1 = { "permissions" : ["s3:PutObject"] },
+    app-2 = { "permissions" : ["s3:GetObject", "s3:PutObject"] },
+    app-3 = { "permissions" : ["s3:GetObjectVersion"] }
+  }
+}
+
 data "aws_eks_cluster" "this" { # get EKS cluster attributes to use later on.
   name = "test-eks-cluster"
 }
@@ -5,11 +13,7 @@ data "aws_eks_cluster" "this" { # get EKS cluster attributes to use later on.
 data "aws_caller_identity" "current" {} # get current account ID
 
 module "s3_bucket" {
-    for_each = {
-    app-1 = { "permissions" : ["s3:PutObject"] },
-    app-2 = { "permissions" : ["s3:GetObject", "s3:PutObject"] },
-    app-3 = { "permissions" : ["s3:GetObjectVersion"] }
-  }
+  for_each = local.apps
 
   source = "terraform-aws-modules/s3-bucket/aws"
 
@@ -21,11 +25,7 @@ module "s3_bucket" {
 }
 
 module "iam_assumable_role_with_oidc" {
-    for_each = {
-    app-1 = { "permissions" : ["s3:PutObject"] },
-    app-2 = { "permissions" : ["s3:GetObject", "s3:PutObject"] },
-    app-3 = { "permissions" : ["s3:GetObjectVersion"] }
-  }
+    for_each = local.apps
 
   source      = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
 
@@ -44,11 +44,7 @@ module "iam_assumable_role_with_oidc" {
 }
 
 resource "aws_iam_policy" "the_policy" {
-    for_each = {
-    app-1 = { "permissions" : ["s3:PutObject"] },
-    app-2 = { "permissions" : ["s3:GetObject", "s3:PutObject"] },
-    app-3 = { "permissions" : ["s3:GetObjectVersion"] }
-  }
+    for_each = local.apps
 
   name_prefix = join("",[each.key,"-"])
   path        = "/"

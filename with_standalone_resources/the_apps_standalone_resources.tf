@@ -1,10 +1,14 @@
-# S3 resources
-resource "aws_s3_bucket" "the_bucket" {
-  for_each = {
+locals {
+  apps = {
     app-1 = { "permissions" : ["s3:PutObject"] },
     app-2 = { "permissions" : ["s3:GetObject", "s3:PutObject"] },
     app-3 = { "permissions" : ["s3:GetObjectVersion"] }
   }
+}
+
+# S3 resources
+resource "aws_s3_bucket" "the_bucket" {
+  for_each = local.apps
 
   bucket_prefix = join("", [each.key, "-"])
 }
@@ -26,11 +30,7 @@ resource "aws_s3_bucket_ownership_controls" "the_bucket_oc" {
 resource "aws_s3_bucket_acl" "the_bucket_acl" {
   depends_on = [aws_s3_bucket_ownership_controls.the_bucket_oc]
 
-  for_each = {
-    app-1 = { "permissions" : ["s3:PutObject"] },
-    app-2 = { "permissions" : ["s3:GetObject", "s3:PutObject"] },
-    app-3 = { "permissions" : ["s3:GetObjectVersion"] }
-  }
+  for_each = local.apps
 
   bucket = aws_s3_bucket.the_bucket[each.key].id
 
@@ -38,11 +38,7 @@ resource "aws_s3_bucket_acl" "the_bucket_acl" {
 }
 
 resource "aws_s3_bucket_public_access_block" "the_bucket_ab" {
-  for_each = {
-    app-1 = { "permissions" : ["s3:PutObject"] },
-    app-2 = { "permissions" : ["s3:GetObject", "s3:PutObject"] },
-    app-3 = { "permissions" : ["s3:GetObjectVersion"] }
-  }
+  for_each = local.apps
 
   bucket = aws_s3_bucket.the_bucket[each.key].id
 
@@ -79,11 +75,7 @@ data "aws_iam_policy_document" "assume-policy" { # create an assume policy for S
 
 ## Role definition
 resource "aws_iam_role" "the_role" { # create the IAM role and attach both assume and inline identity based policies.
-  for_each = {
-    app-1 = { "permissions" : ["s3:PutObject"] },
-    app-2 = { "permissions" : ["s3:GetObject", "s3:PutObject"] },
-    app-3 = { "permissions" : ["s3:GetObjectVersion"] }
-  }
+  for_each = local.apps
 
   name = each.key
   path               = "/"
@@ -107,11 +99,7 @@ resource "aws_iam_role" "the_role" { # create the IAM role and attach both assum
 }
 
 resource "aws_iam_policy" "the_policy" {
-  for_each = {
-    app-1 = { "permissions" : ["s3:PutObject"] },
-    app-2 = { "permissions" : ["s3:GetObject", "s3:PutObject"] },
-    app-3 = { "permissions" : ["s3:GetObjectVersion"] }
-  }
+  for_each = local.apps
 
   name_prefix = join("",[each.key,"-"])
   path        = "/"
@@ -129,11 +117,7 @@ resource "aws_iam_policy" "the_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "the_policy_attachment" {
-  for_each = {
-    app-1 = { "permissions" : ["s3:PutObject"] },
-    app-2 = { "permissions" : ["s3:GetObject", "s3:PutObject"] },
-    app-3 = { "permissions" : ["s3:GetObjectVersion"] }
-  }
+  for_each = local.apps
 
   role       = aws_iam_role.the_role[each.key].name
   policy_arn = aws_iam_policy.the_policy[each.key].arn
